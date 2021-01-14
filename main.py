@@ -3,6 +3,11 @@ import pygame
 from pygame.locals import *
 from time import sleep as s
 import os
+from images import *
+from sounds import *
+from button import Button
+from object import object
+from bullet import Bullet
 pygame.mixer.pre_init(44100, -16, 2, 512)
 pygame.init()
 pygame.font.init()
@@ -14,64 +19,11 @@ display_width = 800#800
 display_height = 600
 #        КАРТИНКИ    КатусОВ
 
-cactus_img = [pygame.image.load(link + 'кактусы/Cactus0.png'),pygame.image.load(link + 'кактусы/Cactus1.png'),pygame.image.load(link + 'кактусы/Cactus2.png')]
+
 
 #         ОПЦИИ КАКТУСА
 cactus_options = [69,445,37,410,40,420]
 #    
-
-shot_sound = pygame.mixer.Sound(link+'audio/shot.wav')
-shot_img = pygame.image.load(link+ 'объекты/shot.png')
-shot_img = pygame.transform.scale(shot_img, (22,5))
-
-dino_img = [pygame.image.load(link + 'динозавр/Dino0.png'),pygame.image.load(link + 'динозавр/Dino1.png'),pygame.image.load(link + 'динозавр/Dino2.png')
-,pygame.image.load(link + 'динозавр/Dino3.png'),pygame.image.load(link + 'динозавр/Dino4.png')]
-
-
-dino_img_stop = pygame.image.load(link + 'динозавр/Dino_jump.png')
-landShaft= pygame.image.load(link+'ландшафт\\Shop.jpg')
-
-stone_img = [pygame.image.load(link + 'объекты/Stone0.png'),pygame.image.load(link + 'объекты/Stone1.png')]
-
-
-cloud_img = [pygame.image.load(link + 'объекты/Cloud0.png'),pygame.image.load(link + 'объекты/Cloud1.png')]
-
-if random.randint(1,50) == 1:
-	legendary=True
-	land = pygame.image.load(link + 'ландшафт/legendary_Land.jpg')
-	health_img = pygame.image.load(link + 'объекты/legendary_heart.png')
-	
-	hp_ = pygame.mixer.Sound(link + 'audio/legendary_hp-.wav')
-	dino_img_stop = pygame.image.load(link + 'динозавр/legendary_Dino_jump.png')
-	dino_img = [pygame.image.load(link + 'динозавр/legendary_Dino0.png'),pygame.image.load(link + 'динозавр/legendary_Dino1.png'),pygame.image.load(link + 'динозавр/legendary_Dino2.png')
-	,pygame.image.load(link + 'динозавр/legendary_Dino3.png'),pygame.image.load(link + 'динозавр/legendary_Dino4.png')]
-
-else:
-	legendary=False
-	land = pygame.image.load(link + 'ландшафт/Land.jpg')
-	hp_ = pygame.mixer.Sound(link + 'audio/hp-.wav')
-	health_img = pygame.image.load(link + 'объекты/heart.png')
-	
-	dino_img_stop = pygame.image.load(link + 'динозавр/Dino_jump.png')
-	dino_img = [pygame.image.load(link + 'динозавр/Dino0.png'),pygame.image.load(link + 'динозавр/Dino1.png'),pygame.image.load(link + 'динозавр/Dino2.png')
-	,pygame.image.load(link + 'динозавр/Dino3.png'),pygame.image.load(link + 'динозавр/Dino4.png')]
-health_img = pygame.transform.scale(health_img,(30,30))
-
-
-jump_sound = pygame.mixer.Sound(link + 'audio/рык.wav')
-
-
-fall_sound = pygame.mixer.Sound(link + 'audio/падение.wav')
-
-
-
-loss = pygame.mixer.Sound(link + 'audio/loss.wav')
-hearts_plus_sound = pygame.mixer.Sound(link + 'audio/hp+.wav')
-
-
-button_sound = pygame.mixer.Sound(link + 'audio/button.wav')
-
-menu_bg = pygame.image.load(link + 'ландшафт/Menu.jpg')
 
 img_counter = 0
 health = 2
@@ -105,85 +57,6 @@ img_counter = 5
 #
 scores = int(0)
 
-class Bullet(object):
-	def __init__(self, x,y, speed=8 ):
-		self.x=x
-		self.y=y
-		self.speed=speed
-
-	def move(self):
-		self.x+= self.speed
-		if self.x <= display_width:
-			display.blit(shot_img, (self.x,self.y))
-			return True
-		else:
-			return False
-
-class Button:
-	def __init__(self,width, heigth,i_c=(13,162, 58),a_c=(23,204,58)):
-		self.width = width
-		self.heigth = heigth
-		self.inactive_clr = i_c
-		self.active_clr = a_c
-
-	def draw(self, x , y , message, action=None , font_size=30):
-		self.x=x
-		self.y=y
-		mouse= pygame.mouse.get_pos()
-		click= pygame.mouse.get_pressed()
-
-
-		if x< mouse[0] < x + self.width and y< mouse[1] < y + self.heigth:
-			pygame.draw.rect(display,self.active_clr , (x,y,self.width, self.heigth))
-                
-			if click[0] == 1:
-				pygame.mixer.Sound.play(button_sound)
-				pygame.time.delay(300)
-				if action is not None:
-					action()
-
-		else:
-			pygame.draw.rect(display, self.inactive_clr , (x,y,self.width, self.heigth))
-
-		print_text(message=message,x=x+10,y=y+10,font_size= font_size)
-
-	def check(self):
-		mouse= pygame.mouse.get_pos()
-		click= pygame.mouse.get_pressed()
-
-
-		if self.x< mouse[0] < self.x + self.width and self.y< mouse[1] < self.y + self.heigth:        
-			if click[0] == 1:
-				return True
-		else:
-			return False
-
-class object():
-    def __init__(self, x, y, width,image,speed):
-        self.x = x
-        self.y = y
-        self.widht = width
-        self.image = image
-        self.speed = speed
-
-    def move(self):
-        if self.x >= -self.widht:
-            display.blit(self.image,(self.x,self.y))
-            # pygame.draw.rect(display,(224,91,22),(self.x, self.y, self.widht, self.height))
-            self.x -= self.speed
-            return True
-        else:
-            return False
-    def return_self(self,radius,y,widht,image):
-        self.x = radius
-        self.y = y
-        self.widht = widht
-        self.image = image
-        display.blit(self.image,(self.x,self.y))
-
-
-
-if __name__ == '__main__':pass
 
 def game_cycle():
     cactus_arr = []
